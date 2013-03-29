@@ -4,10 +4,8 @@
  * INTEGRAL - generate an approximate solution to a Fredholm integral
  *		equation of the second kind using Chenyshev polynominals.
  *
- * written: Richard.Marejka@Canada.Sun.COM
+ * written: rwmarejka@mac.com
  */
-
-static char	*SCCSid	= "@(#) integral.c 1.2 94/02/08 Richard Marejka";
 
 /* Feature Test Macros		*/
 
@@ -31,8 +29,8 @@ static char	*SCCSid	= "@(#) integral.c 1.2 94/02/08 Richard Marejka";
 #define	N	25		/* size of matrix and vectors	*/
 #define	M	11		/* number of sample points	*/
 
-#define	RE(x,l,u)	(0.5*((u)+(l)+((u)-(l))*(x)))
-#define	VALUE(i,n)	(cos(((i)*M_PI)/(n)))
+#define	RE(x,l,u)       (0.5*((u)+(l)+((u)-(l))*(x)))
+#define	VALUE(i,n)      (cos(((i)*M_PI)/(n)))
 #define	_exchange(a,b)	{double _T = (a); (a)=(b); (b)=_T;}
 
 /* Data Declarations		*/
@@ -60,9 +58,9 @@ extern	double	MatrixLUdecomp( int, MATRIX, int [N] );
 extern	double	MatrixLUdeterminant( int, MATRIX, int [N] );
 extern	void	MatrixLUsolve( int, MATRIX, VECTOR, int [N] );
 
-extern	int	VectorWrite( FILE *, char *, VECTOR, int );
-extern	int	MatrixWrite( FILE *, char *, MATRIX, int, int );
-extern	int	PointWrite( FILE *, char *, POINT [M], int, double (*)( double ) );
+extern	int     VectorWrite( FILE *, char *, VECTOR, int );
+extern	int     MatrixWrite( FILE *, char *, MATRIX, int, int );
+extern	int     PointWrite( FILE *, char *, POINT [M], int, double (*)( double ) );
 
 extern	double	getLower( void );
 extern	double	getUpper( void );
@@ -228,7 +226,7 @@ ChebyshevEval( double x, VECTOR a, int n, double lower, double upper ) {
 
 	void
 Integrate( MATRIX b, MATRIX d, int n, double lambda, double lower, double upper ) {
-	int	i;
+	int     i;
 	double	factor	= lambda * ( upper - lower ) / 2.0;
 	MATRIX	t;
 
@@ -240,14 +238,10 @@ Integrate( MATRIX b, MATRIX d, int n, double lambda, double lower, double upper 
 			t[i][k]	= 0.0;
 
 		for ( ; j < n; j+=2 ) {
-#if 0
-			t[i][j]	= 0.5 * ( 1.0/(i+j+1.0) - 1.0/(i+j-1.0) + 1.0/(i-j+1.0) - 1.0/(i-j-1.0) );
-#else
 			int	diff	= i - j;
-			int	sum	= i + j;
+			int	sum     = i + j;
 
 			t[i][j]	= -( 1.0 / ( sum * sum - 1.0 ) + 1.0 / ( diff * diff - 1.0 ) );
-#endif
 		}
 	}
 

@@ -32,7 +32,7 @@ double
 K( double x, double y ) {
 	double	d	= x - y;
 
-	return( 1.0 / ( 1.0 + d * d ) );
+	return 1.0 / ( 1.0 + d * d );
 }
 
 double

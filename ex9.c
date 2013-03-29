@@ -1,8 +1,8 @@
 /*
  *
- * f(x) - (1/2) int[0,1] ( 1/( 1 + x + y ) ) * f(y) dy = sin( pi * x )A
+ * f(x) - (1/2) int[0,1] ( 1/( 1 + x + y ) ) * f(y) dy = sin( pi * x )
  *
- * f(x) = sum(j=0,5) a[j] * x^j
+ * f(x) = sum(j=0,6) a[j] * x^j
  */
 
 #include <math.h>
@@ -24,12 +24,12 @@ getLambda() {
 
 double
 g( double x ) {
-	return sin( M_PI * x );;
+	return sin( M_PI * x );
 }
 
 double
 K( double x, double y ) {
-	return 1.0 / ( 1.0 + x + y );;
+	return 1.0 / ( 1.0 + x + y );
 }
 
 double

@@ -1,5 +1,5 @@
 /*
- *	f(x) - (1/2) * int [-1,+1] sin( pi * x * y ) f(y) dy = x ^ 3
+ *	f(x) - (1/2) * int [-1,+1] sin( pi * x * y ) * f(y) dy = x ^ 3
  *
  *	f(x) = a5 * x^5 + a3 * x^3 + a1 * x
  */

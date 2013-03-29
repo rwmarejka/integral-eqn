@@ -1,7 +1,7 @@
 /*
- * f(x) + int [0,pi] cos(x)cos(y)f(y) dy = (1 + pi/2)*cos(x);
+ * f(x) + int [0,pi] cos(x) * cos(y) * f(y) dy = (1 + pi/2) * cos(x);
  *
- * f(x)=cos(x)
+ * f(x) = cos(x)
  *
  */
 

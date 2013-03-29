@@ -1,5 +1,5 @@
 /*
- *	f(x) - int [0,1] exp( x * y ) f(y) dy = x ^ 4
+ *	f(x) - int [0,1] exp( x * y ) * f(y) dy = x ^ 4
  *
  *	f(x) = x ^ 4 + 1/10 * tau( x )
  */

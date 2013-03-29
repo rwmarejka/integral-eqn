@@ -1,7 +1,7 @@
 /*
- * f(x) - int [0,2*pi] sin(x+2y) f(y) dy = x
+ * f(x) - int [0,2*pi] sin( x + 2 * y ) * f(y) dy = x
  *
- * f(x)=x-pi*cos(x) 
+ * f(x) = x - pi * cos(x) 
  */
 
 #include <math.h>

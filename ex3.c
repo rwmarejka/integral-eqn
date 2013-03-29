@@ -1,7 +1,7 @@
 /*
- * f(x) - int[0,1] K(x,y) f(y) dy = ( 1 - 1  / pi^2 ) * sin( pi x )
+ * f(x) - int[0,1] K(x,y) * f(y) dy = ( 1 - 1  / pi^2 ) * sin( pi * x )
  *
- * K(x,y) = ( x <= y )? 1 - y : ( 1 - x )
+ * K(x,y) = ( x <= y )? x * ( 1 - y ) : y * ( 1 - x )
  *
  * f(x) = sin( pi * x )
  */
