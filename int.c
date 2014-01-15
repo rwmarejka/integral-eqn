@@ -26,7 +26,7 @@
 #	define	M_PI	(3.1415926535897932384626433)
 #endif
 
-#define	N	25		/* size of matrix and vectors	*/
+#define	N	15		/* size of matrix and vectors	*/
 #define	M	11		/* number of sample points	*/
 
 #define	RE(x,l,u)       (0.5*((u)+(l)+((u)-(l))*(x)))
@@ -142,10 +142,10 @@ ChebyshevCoeff( VECTOR a, int n, double lower, double upper, double (*f)( double
 		for ( j=1; j < n; ++j )
 			sum	+= b[j] * cos( j * ui );
 
-		a[i]	= fo * sum;		/* one coefficient	*/
+		a[i]	= fo * sum;             /* one coefficient          */
 	}
 
-	a[n]	*= 0.5;			/* half last term		*/
+	a[n]	*= 0.5;                     /* half last term           */
 
 	return;
 }
@@ -158,49 +158,46 @@ Chebyshev2Coeff( MATRIX a, int n, double lb, double ub, double (*f)( double, dou
 	int	n2;
 	int	np1;
 	MATRIX	Kxy;
+	VECTOR  Xk;
 
 	np1	= n--;
 	n2	= n * n;
 
-	for ( i=0; i <= n; ++i ) {
+	for ( i=0; i <= n; ++i )			/* compute the abscissa     */
+		Xk[i] = RE( VALUE( i, n ), lb, ub );
+
+	for ( i=0; i <= n; ++i ) {			/* compute K(x,y)           */
 		int	j;
 
 		for ( j=0; j <= n; ++j )
-			Kxy[i][j]	= (*f)( RE( VALUE( i, n ), lb, ub ), RE( VALUE( j, n ), lb, ub ) );
+			Kxy[i][j]	= (*f)( Xk[i], Xk[j] );
 
+		Kxy[i][n]	*= 0.5;             /* half the last term       */
 	}
 
-	for ( i=0; i <= n; ++i ) {
+	for ( i=0; i <= n; ++i ) {          /* compute K matrix         */
 		int	j;
-		double	x	= RE( VALUE( i, n ), lb, ub );
+		double	x	= Xk[i];
 
 		for ( j=0; j <= n; ++j ) {
 			int	k;
 			VECTOR	b;
-			double	y	= RE( VALUE( j, n ), lb, ub );
 
-			for ( k=0; k <= n; ++k ) {
-				int	l;
-				VECTOR	v;
+			for ( k=0; k <= n; ++k )
+				b[k]	 = ChebyshevEval( Xk[j], &Kxy[k], np1, lb, ub );
 
-				for ( l=0; l <= n; ++l )
-					v[l]	= Kxy[k][l];
-
-				v[n]	*= 0.5;		/* half last term	*/
-				b[k]	 = ChebyshevEval( y, v, np1, lb, ub );
-			}
-
-			b[n]	*= 0.5;			/* half last term	*/
+			b[n]	*= 0.5;             /* half last term           */
 			a[i][j]	 = 4.0 * ChebyshevEval( x, b, np1, lb, ub ) / n2;
 		}
 	}
 
-	for ( i=0; i <= n; ++i ) {		/* half the perimeter terms	*/
+	for ( i=0; i <= n; ++i ) {          /* half the perimeter terms */
 		a[0][i]	*= 0.5;
 		a[i][0]	*= 0.5;
 		a[n][i]	*= 0.5;
 		a[i][n]	*= 0.5;
 	}
+
 	return;
 }
 
@@ -230,7 +227,7 @@ Integrate( MATRIX b, MATRIX d, int n, double lambda, double lower, double upper 
 	double	factor	= lambda * ( upper - lower ) / 2.0;
 	MATRIX	t;
 
-	for ( i=0; i < n; ++i ) {
+	for ( i=0; i < n; ++i ) {                   /* compute t                    */
 		int	j	= ( i % 2 )? 1 : 0;
 		int	k	= ( i % 2 )? 0 : 1;
 
@@ -245,7 +242,7 @@ Integrate( MATRIX b, MATRIX d, int n, double lambda, double lower, double upper 
 		}
 	}
 
-	for ( i=0; i < n; ++i ) {
+	for ( i=0; i < n; ++i ) {                   /* d = b * t                    */
 		int	j;
 
 		for ( j=0; j < n; ++j ) {
@@ -258,7 +255,7 @@ Integrate( MATRIX b, MATRIX d, int n, double lambda, double lower, double upper 
 			d[i][j]	= factor * sum;
 		}
 
-		d[i][i]	+= 1.0;
+		d[i][i]	+= 1.0;                         /* d += I                       */
 	}
 
 	return;
