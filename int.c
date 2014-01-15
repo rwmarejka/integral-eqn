@@ -11,7 +11,7 @@
 
 #define	_POSIX_SOURCE
 
-/* Include Files		*/
+/* Include Files            */
 
 #include <stdio.h>
 #include <math.h>
@@ -26,8 +26,8 @@
 #	define	M_PI	(3.1415926535897932384626433)
 #endif
 
-#define	N	15		/* size of matrix and vectors	*/
-#define	M	11		/* number of sample points	*/
+#define	N	15                          /* size of matrix and vectors	*/
+#define	M	11                          /* number of sample points	*/
 
 #define	RE(x,l,u)       (0.5*((u)+(l)+((u)-(l))*(x)))
 #define	VALUE(i,n)      (cos(((i)*M_PI)/(n)))
@@ -78,19 +78,15 @@ main( int argc, char *argv[] ) {
 	VECTOR	x, b;
 	MATRIX	a, A;
 	POINT	pt[M];
-	double	upper;
-	double	lower;
-	double	lambda;
+	double	upper   = getUpper();
+	double	lower   = getLower();
+	double	lambda  = getLambda();
 	int	n;
-
-	lower	= getLower();
-	upper	= getUpper();
-	lambda	= getLambda();
 
 	if ( argc > 1 )
 		n	= atoi( argv[1] );
 	else
-		n	= ( N > 25 )? 25 : N;
+		n	= N;
 
 	assert( n <= N );
 
@@ -119,33 +115,26 @@ main( int argc, char *argv[] ) {
 
 	void
 ChebyshevCoeff( VECTOR a, int n, double lower, double upper, double (*f)( double ) ) {
-	VECTOR	b;
-	double	um;
-	double	fo;
-	int	i;
+	VECTOR	Y;
+	double	um  = M_PI / --n;
+	double	fo  = 2.0 / n;
+	int     i   = 0;
 
-	--n;
-	um	= M_PI / n;
-	fo	= 2.0  / n;
-
-	for ( i=0; i <= n; ++i ) {
-		double	p	= RE( cos( i * um ), lower, upper );
-
-		b[i]	= (*f)( p );
-	}
+	for ( ; i <= n; ++i )               /* compute f(x)             */
+		Y[i]	= (*f)( RE( VALUE( i, n ), lower, upper ) );
 
 	for ( i=0; i <= n; ++i ) {
-		int	j;
+		int     j   = 1;
 		double	sum	= 0.5 * ( b[0] + ( ( i % 2 )? -b[n] : b[n] ) );
 		double	ui	= i * um;
 
-		for ( j=1; j < n; ++j )
-			sum	+= b[j] * cos( j * ui );
+		for ( ; j < n; ++j )
+			sum	+= Y[j] * cos( j * ui );
 
 		a[i]	= fo * sum;             /* one coefficient          */
 	}
 
-	a[n]	*= 0.5;                     /* half last term           */
+	a[n] *= 0.5;                        /* half last term           */
 
 	return;
 }
@@ -153,41 +142,39 @@ ChebyshevCoeff( VECTOR a, int n, double lower, double upper, double (*f)( double
 /*	Chebyshev2Coeff - generate Chebyshev coefficients to K(x,y)	*/
 
 	void
-Chebyshev2Coeff( MATRIX a, int n, double lb, double ub, double (*f)( double, double ) ) {
-	int	i;
-	int	n2;
-	int	np1;
-	MATRIX	Kxy;
-	VECTOR  Xk;
+Chebyshev2Coeff( MATRIX a, int n, double lower, double upper, double (*f)( double, double ) ) {
+	int     i   = 0;
+	int     np1 = n--;
+    double  factor = 4.0 / ( n * n );
+	MATRIX	K;
+	VECTOR  X;
 
-	np1	= n--;
-	n2	= n * n;
-
-	for ( i=0; i <= n; ++i )			/* compute the abscissa     */
-		Xk[i] = RE( VALUE( i, n ), lb, ub );
+	for ( ; i <= n; ++i )               /* compute the abscissa     */
+		X[i] = RE( VALUE( i, n ), lower, upper );
 
 	for ( i=0; i <= n; ++i ) {			/* compute K(x,y)           */
-		int	j;
+		int     j   = 0;
+        double  Xi  = X[i];
 
-		for ( j=0; j <= n; ++j )
-			Kxy[i][j]	= (*f)( Xk[i], Xk[j] );
+		for ( ; j <= n; ++j )
+			K[i][j]	= (*f)( Xi, X[j] );
 
-		Kxy[i][n]	*= 0.5;             /* half the last term       */
+		K[i][n]	*= 0.5;                 /* half the last term       */
 	}
 
 	for ( i=0; i <= n; ++i ) {          /* compute K matrix         */
-		int	j;
-		double	x	= Xk[i];
+		int     j   = 0;
+		double	Xi	= X[i];
 
-		for ( j=0; j <= n; ++j ) {
-			int	k;
+		for ( ; j <= n; ++j ) {
+			int     k   = 0;
 			VECTOR	b;
 
-			for ( k=0; k <= n; ++k )
-				b[k]	 = ChebyshevEval( Xk[j], &Kxy[k], np1, lb, ub );
+			for ( ; k <= n; ++k )
+				b[k]	 = ChebyshevEval( X[j], &K[k], np1, lower, upper );
 
 			b[n]	*= 0.5;             /* half last term           */
-			a[i][j]	 = 4.0 * ChebyshevEval( x, b, np1, lb, ub ) / n2;
+			a[i][j]	 = factor * ChebyshevEval( Xi, b, np1, lower, upper );
 		}
 	}
 
@@ -223,11 +210,11 @@ ChebyshevEval( double x, VECTOR a, int n, double lower, double upper ) {
 
 	void
 Integrate( MATRIX b, MATRIX d, int n, double lambda, double lower, double upper ) {
-	int     i;
+	int     i       = 0;
 	double	factor	= lambda * ( upper - lower ) / 2.0;
 	MATRIX	t;
 
-	for ( i=0; i < n; ++i ) {                   /* compute t                    */
+	for ( ; i < n; ++i ) {                      /* compute t                    */
 		int	j	= ( i % 2 )? 1 : 0;
 		int	k	= ( i % 2 )? 0 : 1;
 
@@ -238,18 +225,18 @@ Integrate( MATRIX b, MATRIX d, int n, double lambda, double lower, double upper 
 			int	diff	= i - j;
 			int	sum     = i + j;
 
-			t[i][j]	= -( 1.0 / ( sum * sum - 1.0 ) + 1.0 / ( diff * diff - 1.0 ) );
+			t[i][j]	= -( 1.0 / ( sum * sum - 1 ) + 1.0 / ( diff * diff - 1 ) );
 		}
 	}
 
 	for ( i=0; i < n; ++i ) {                   /* d = b * t                    */
-		int	j;
+		int	j   = 0;
 
-		for ( j=0; j < n; ++j ) {
-			int	k;
+		for ( ; j < n; ++j ) {
+			int     k   = 1;
 			double	sum	= b[i][0] * t[0][j];
 
-			for ( k=1; k < n; ++k )
+			for ( ; k < n; ++k )
 				sum	+= b[i][k] * t[k][j];
 
 			d[i][j]	= factor * sum;
@@ -265,7 +252,7 @@ Integrate( MATRIX b, MATRIX d, int n, double lambda, double lower, double upper 
 
 	void
 Points( POINT pt[M], int m, VECTOR a, int n, double lower, double upper ) {
-	int	i	= 0;
+	int     i	= 0;
 	double	dx	= ( upper - lower ) / ( m - 1 );
 
 	for ( ; i < m; ++i, ++pt ) {
@@ -279,7 +266,7 @@ Points( POINT pt[M], int m, VECTOR a, int n, double lower, double upper ) {
 
 	double
 MatrixSolve( int n, MATRIX a, VECTOR x, VECTOR b ) {
-	int	ipvt[N];	/* the pivot vector		*/
+	int     ipvt[N];	/* the pivot vector		*/
 	double	status;		/* indicates singularity	*/
 /*
  * Decompose a to upper triangular...
@@ -287,9 +274,9 @@ MatrixSolve( int n, MATRIX a, VECTOR x, VECTOR b ) {
 	status	= MatrixLUdecomp( n, a, ipvt );
 
 	if ( status != 0.0 ) {		/* check status of system	*/
-		int	i;
+		int	i   = 0;
 
-		for ( i=0; i < n; ++i )
+		for ( ; i < n; ++i )
 			x[i]	= b[i];
 
 		MatrixLUsolve( n, a, x, ipvt );
@@ -304,32 +291,34 @@ MatrixSolve( int n, MATRIX a, VECTOR x, VECTOR b ) {
 
 	void
 MatrixLUsolve( int n, MATRIX a, VECTOR b, int ipvt[N] ) {
-	int	i, k, m;
-	double	t;			/* avoid indexing		*/
-
 	if ( n != 1 ) {			/* if not the trivial case	*/
+        int     k   = 0;
+        int     i;
+        double  t;
 /*
  * Forward elimination...
  */
-		for ( k=0; k < (n-1); ++k ) {
-			m	= ipvt[k];
+		for ( ; k < (n-1); ++k ) {
+			int     m	= ipvt[k];
+
 			_exchange( b[k], b[m] );
 			t	= b[k];
 
-			for ( i=(k+1); i < n; ++i )
+			for ( i=k+1; i < n; ++i )
 				b[i]	+= a[i][k] * t;
 		}
 /*
  * Back substitution...
  */
 		for ( k=(n-1); k > 0; --k ) {
-			b[k]	/= a[k][k];
-			t	 = -b[k];
+			b[k] /= a[k][k];
+			t     = -b[k];
 
 			for ( i=0; i < k; ++i )
 				b[i]	+= a[i][k] * t;
 		}
 	}
+
 	b[0]	/= a[0][0];			/* the trivial case	*/
 
 	return;
@@ -339,23 +328,25 @@ MatrixLUsolve( int n, MATRIX a, VECTOR b, int ipvt[N] ) {
 
 	double
 MatrixLUdecomp( int n, MATRIX a, int ipvt[N] ) {
-	int	i, j, k, m;
-	double	t, ek, status;
-	double	anorm	= 0.0;
-	double	ynorm	= 0.0;
-	double	znorm	= 0.0;
-	VECTOR	work;
+    double  status;
 
 	ipvt[n-1] = 1;
 
 	if ( n != 1 ) {
+        int     i;
+        int     k       = 0;
+        double	t;
+        double	anorm	= 0.0;
+        double	ynorm	= 0.0;
+        double	znorm	= 0.0;
+        VECTOR	work;
 /*
  * Compute 1-norm of a
  */
-		for ( j=0; j < n; ++j ) {
-			t	= 0;
+		for ( ; k < n; ++k ) {
+			t	= 0.0;
 			for ( i=0; i < n; ++i )
-				t	+= fabs( a[i][j] );
+				t	+= fabs( a[i][k] );
 
 			if ( t > anorm )
 				anorm	= t;
@@ -364,7 +355,8 @@ MatrixLUdecomp( int n, MATRIX a, int ipvt[N] ) {
  * Gaussian elimination with partial pivoting
  */
 		for ( k=0; k < (n-1); ++k ) {
-			m	= k;
+            int j;
+            int m = k;
 /*
  * Find the pivot...
  */
@@ -380,7 +372,7 @@ MatrixLUdecomp( int n, MATRIX a, int ipvt[N] ) {
 			t	= a[m][k];
 			_exchange( a[m][k], a[k][k] );
 
-			if ( t != 0 )	/* skip step on zero pivot	*/
+			if ( t != 0.0 )	/* skip step on zero pivot	*/
 /*
  * Compute multipliers
  */
@@ -393,7 +385,7 @@ MatrixLUdecomp( int n, MATRIX a, int ipvt[N] ) {
 				t	= a[m][j];
 				_exchange( a[m][j], a[k][j] );
 
-				if ( t != 0 )
+				if ( t != 0.0 )
 					for ( i=(k+1); i < n; ++i )
 						a[i][j]	+= a[i][k] * t;
 			}
@@ -414,12 +406,14 @@ MatrixLUdecomp( int n, MATRIX a, int ipvt[N] ) {
  *	( a-transpose ) * y = e
  */
 		for ( k=0; k < n; ++k ) {
-			t	= 0;
+            double ek;
+
+			t	= 0.0;
 			if ( k != 0 )
 				for ( i=0; i < k; ++i )
 					t	+= a[i][k] * work[i];
 
-			ek	= ( t < 0 )? -1 : 1;
+			ek	= ( t < 0.0 )? -1.0 : 1.0;
 /*
  * Test for singularity...
  */
@@ -428,8 +422,11 @@ MatrixLUdecomp( int n, MATRIX a, int ipvt[N] ) {
 
 			work[k]	= -( ek + t ) / a[k][k];
 		}
+
 		for ( k=(n-2); k >= 0; --k ) {
-			t	= 0;
+            int m;
+
+			t	= 0.0;
 
 			for ( i=(k+1); i < n; ++i )
 				t	+= a[i][k] * work[k];
@@ -440,6 +437,7 @@ MatrixLUdecomp( int n, MATRIX a, int ipvt[N] ) {
 			if ( m != k )
 				_exchange( work[k], work[m] );
 		}
+
 		for ( i=0; i < n; ++i )
 			ynorm	+= fabs( work[i] );
 /*
@@ -454,18 +452,17 @@ MatrixLUdecomp( int n, MATRIX a, int ipvt[N] ) {
  */
 		status	= anorm * znorm / ynorm;
 
-		if ( status < 1 )
-			status	= 1;
+		if ( status < 1.0 )
+			status	= 1.0;
 
 		return( status );
-	}
-	else {				/* the trivial case		*/
-		status	= 1;
+	} else {                    /* the trivial case		*/
+		status	= 1.0;
 
 		if ( fabs( a[0][0] ) > TOLERANCE )
 			return( status );
-		else			/* singularity???		*/
-			return( 0 );
+		else                    /* singularity???		*/
+			return( 0.0 );
 	}
 /* NOTREACHED */
 }
@@ -477,8 +474,8 @@ MatrixLUdecomp( int n, MATRIX a, int ipvt[N] ) {
 
 	double
 MatrixLUdeterminant( int n, MATRIX a, int ipvt[N] ) {
-	register int	i	= 0;
-	register double	r	= ipvt[n-1];
+    int     i	= 0;
+    double	r	= ipvt[n-1];
 
 	for ( ; i < n; ++i )
 		r	*= a[i][i];
@@ -490,11 +487,11 @@ MatrixLUdeterminant( int n, MATRIX a, int ipvt[N] ) {
 
 	int
 VectorWrite( FILE *fp, char *header, VECTOR a, int n ) {
-	int	i;
+	int	i   = 0;
 
 	fprintf( fp, "%s:\n\n", header );
 
-	for ( i=0; i < n; ++i )
+	for ( ; i < n; ++i )
 		fprintf( fp, "\t[%3d]:  %9.6f\n", i, *a++ );
 
 	fputc( '\n', fp );
@@ -506,14 +503,14 @@ VectorWrite( FILE *fp, char *header, VECTOR a, int n ) {
 
 	int
 MatrixWrite( FILE *fp, char *header, MATRIX a, int n, int m ) {
-	int	i;
+	int	i   = 0;
 
 	if ( ( n > 10 ) || ( m > 10 ) )
 		return( ferror( fp ) );
 
 	fprintf( fp, "%s:\n\n", header );
 
-	for ( i=0; i < n; ++i ) {
+	for ( ; i < n; ++i ) {
 		int	j	= 0;
 
 		fputc( '\t', fp );
