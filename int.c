@@ -125,7 +125,7 @@ ChebyshevCoeff( VECTOR a, int n, double lower, double upper, double (*f)( double
 
 	for ( i=0; i <= n; ++i ) {
 		int     j   = 1;
-		double	sum	= 0.5 * ( b[0] + ( ( i % 2 )? -b[n] : b[n] ) );
+		double	sum	= 0.5 * ( Y[0] + ( ( i % 2 )? -Y[n] : Y[n] ) );
 		double	ui	= i * um;
 
 		for ( ; j < n; ++j )
