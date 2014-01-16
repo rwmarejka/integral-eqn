@@ -29,8 +29,11 @@
 #define	N	15                          /* size of matrix and vectors	*/
 #define	M	11                          /* number of sample points	*/
 
-#define	RE(x,l,u)       (0.5*((u)+(l)+((u)-(l))*(x)))
-#define	VALUE(i,n)      (cos(((i)*M_PI)/(n)))
+/*
+ * XK - translate T sub n ( x sub k ) to the range (a,b) where x sub k = cos ( k * pi / n )
+ */
+
+#define XK(k,n,a,b)     (0.5*((b)+(a)+((b)-(a))*cos((k)*M_PI/(n))))
 #define	_exchange(a,b)	{double _T = (a); (a)=(b); (b)=_T;}
 
 /* Data Declarations		*/
@@ -115,26 +118,23 @@ main( int argc, char *argv[] ) {
 
 	void
 ChebyshevCoeff( VECTOR a, int n, double lower, double upper, double (*f)( double ) ) {
-	VECTOR	Y;
-	double	um  = M_PI / --n;
-	double	fo  = 2.0 / n;
-	int     i   = 0;
+    int     i       = 0;
+    int     np1     = n--;
+    double  factor  = 2.0 / n;
+    VECTOR  X;
+    VECTOR  Y;
 
-	for ( ; i <= n; ++i )               /* compute f(x)             */
-		Y[i]	= (*f)( RE( VALUE( i, n ), lower, upper ) );
+    for ( ; i <= n; ++i ) {             /* compute the abscissa and f(x)    */
+        X[i]    = XK( i, n, lower, upper );
+        Y[i]    = (*f)( X[i] );
+    }
 
-	for ( i=0; i <= n; ++i ) {
-		int     j   = 1;
-		double	sum	= 0.5 * ( Y[0] + ( ( i % 2 )? -Y[n] : Y[n] ) );
-		double	ui	= i * um;
+    Y[n]    *= 0.5;                     /* half the last term       */
 
-		for ( ; j < n; ++j )
-			sum	+= Y[j] * cos( j * ui );
+    for ( i=0; i <= n; ++i )
+        a[i]    = factor * ChebyshevEval( X[i], Y, np1, lower, upper );
 
-		a[i]	= fo * sum;             /* one coefficient          */
-	}
-
-	a[n] *= 0.5;                        /* half last term           */
+    a[n]    *= 0.5;                     /* half the last term       */
 
 	return;
 }
@@ -146,11 +146,11 @@ Chebyshev2Coeff( MATRIX a, int n, double lower, double upper, double (*f)( doubl
 	int     i   = 0;
 	int     np1 = n--;
     double  factor = 4.0 / ( n * n );
+    VECTOR  X;
 	MATRIX	K;
-	VECTOR  X;
 
 	for ( ; i <= n; ++i )               /* compute the abscissa     */
-		X[i] = RE( VALUE( i, n ), lower, upper );
+		X[i] = XK( i, n, lower, upper );
 
 	for ( i=0; i <= n; ++i ) {			/* compute K(x,y)           */
 		int     j   = 0;
@@ -169,16 +169,17 @@ Chebyshev2Coeff( MATRIX a, int n, double lower, double upper, double (*f)( doubl
 		for ( ; j <= n; ++j ) {
 			int     k   = 0;
 			VECTOR	b;
+            double  Xj  = X[j];
 
 			for ( ; k <= n; ++k )
-				b[k]	 = ChebyshevEval( X[j], &K[k], np1, lower, upper );
+				b[k]	 = ChebyshevEval( Xj, K[k], np1, lower, upper );
 
-			b[n]	*= 0.5;             /* half last term           */
+			b[n]	*= 0.5;             /* half the last term       */
 			a[i][j]	 = factor * ChebyshevEval( Xi, b, np1, lower, upper );
 		}
 	}
 
-	for ( i=0; i <= n; ++i ) {          /* half the perimeter terms */
+	for ( i=0; i <= n; ++i ) {          /* half the last terms      */
 		a[0][i]	*= 0.5;
 		a[i][0]	*= 0.5;
 		a[n][i]	*= 0.5;
