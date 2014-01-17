@@ -37,3 +37,8 @@ f( double x ) {
 
 	return ( ( ( 0.014041 ) * x2 + 0.847750 ) * x2 + 0.565420 ) * x;
 }
+
+int
+fredholm() {
+    return 2;
+}

@@ -108,7 +108,7 @@ main( int argc, char *argv[] ) {
 	MatrixWrite( stdout, "Matrix to be solved", A, n, n );
 	det = MatrixSolve( n, A, x, b );
 
-    fprintf( stdout, "det|A| = %9.6f\n\n", det );
+    fprintf( stdout, "\tdeterminant = %9.6f\n\n", det );
 
 	if ( det != 0.0 ) {
 		VectorWrite( stdout, "Chebyshev Coefficients for f(x)", x, n );

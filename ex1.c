@@ -36,3 +36,8 @@ double
 f( double x ) {
 	return cos( x );
 }
+
+int
+fredholm() {
+    return 2;
+}

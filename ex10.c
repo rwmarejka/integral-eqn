@@ -35,3 +35,8 @@ double
 f( double x ) {
 	return x;
 }
+
+int
+fredholm() {
+    return 2;
+}

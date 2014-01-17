@@ -40,3 +40,8 @@ double
 f( double x ) {
 	return sin( x * M_PI );
 }
+
+int
+fredholm() {
+    return 2;
+}

@@ -45,3 +45,8 @@ f( double x ) {
 
 	return ChebyshevEval( x, a, 3, getLower(), getUpper() );
 }
+
+int
+fredholm() {
+    return 2;
+}

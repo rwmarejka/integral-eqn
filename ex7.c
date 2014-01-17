@@ -44,3 +44,8 @@ f( double x ) {
 
 	return x2 * x2 + 0.1 * tau( x );
 }
+
+int
+fredholm() {
+    return 2;
+}
