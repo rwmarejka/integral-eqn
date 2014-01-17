@@ -2,7 +2,7 @@
 % cc -g -Xc -o int int.c -lm
  *
  * INTEGRAL - generate an approximate solution to a Fredholm integral
- *		equation of the second kind using Chenyshev polynominals.
+ *		equation of the second kind using Chebyshev polynominals.
  *
  * written: rwmarejka@mac.com
  */
@@ -26,7 +26,7 @@
 #	define	M_PI	(3.1415926535897932384626433)
 #endif
 
-#define	N	15                          /* size of matrix and vectors	*/
+#define	N	25                          /* size of matrix and vectors	*/
 #define	M	11                          /* number of sample points	*/
 
 /*
@@ -71,6 +71,7 @@ extern	double	getLambda( void );
 extern	double	g( double );
 extern	double	K( double, double );
 extern	double	f( double x );
+extern  int     fredholm( void );
 
 /* External Declarations	*/
 
@@ -84,6 +85,7 @@ main( int argc, char *argv[] ) {
 	double	upper   = getUpper();
 	double	lower   = getLower();
 	double	lambda  = getLambda();
+    double  det;
 	int	n;
 
 	if ( argc > 1 )
@@ -104,13 +106,17 @@ main( int argc, char *argv[] ) {
 	MatrixWrite( stdout, "Chebyshev Coefficients for K(x,y)", a, n, n );
 	Integrate( a, A, n, lambda, lower, upper );
 	MatrixWrite( stdout, "Matrix to be solved", A, n, n );
+	det = MatrixSolve( n, A, x, b );
 
-	if ( MatrixSolve( n, A, x, b ) ) {
+    fprintf( stdout, "det|A| = %9.6f\n\n", det );
+
+	if ( det != 0.0 ) {
 		VectorWrite( stdout, "Chebyshev Coefficients for f(x)", x, n );
 		x[0]	*= 2.0;
 		Points( pt, M, x, n, lower, upper );
 		PointWrite( stdout, "Approximate f(x)", pt, M, f );
 	}
+
 	return( 0 );
 }
 
@@ -243,7 +249,8 @@ Integrate( MATRIX b, MATRIX d, int n, double lambda, double lower, double upper 
 			d[i][j]	= factor * sum;
 		}
 
-		d[i][i]	+= 1.0;                         /* d += I                       */
+        if ( fredholm() == 2 )
+            d[i][i]	+= 1.0;                     /* d += I                       */
 	}
 
 	return;

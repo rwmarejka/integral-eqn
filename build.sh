@@ -14,3 +14,7 @@ cc -o ex8 ex8.c int.o $LIBS
 cc -o ex9 ex9.c int.o $LIBS
 cc -o ex10 ex10.c int.o $LIBS
 cc -o ex11 ex11.c int.o $LIBS
+cc -o ex12 ex12.c int.o $LIBS
+cc -o ex13 ex13.c int.o $LIBS
+cc -o ex14 ex14.c int.o $LIBS
+cc -o ex15 ex15.c int.o $LIBS
