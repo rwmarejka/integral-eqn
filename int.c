@@ -26,8 +26,8 @@
 #	define	M_PI	(3.1415926535897932384626433)
 #endif
 
-#define	N	25                          /* size of matrix and vectors	*/
-#define	M	11                          /* number of sample points	*/
+#define	N	25                          /* size of matrix and vectors   */
+#define	M	 5                          /* number of sample points      */
 
 /*
  * XK - translate T sub n ( x sub k ) to the range (a,b) where x sub k = cos ( k * pi / n )
@@ -95,26 +95,27 @@ main( int argc, char *argv[] ) {
 
 	assert( n <= N );
 
-	fprintf( stdout, "[a,b]:\t[%9.6f,%9.6f]\n", lower, upper );
-	fprintf( stdout, "lambda:\t%9.6f\n\n", lambda );
+	fprintf( stdout, "lambda: %9.6f, %9.6f <= x <= %9.6f\n\n", lambda, lower, upper );
 
 	ChebyshevCoeff( b, n, lower, upper, g );
 	b[0]	*= 0.5;
-	VectorWrite( stdout, "Chebyshev Coefficients for g(x)", b, n );
+	VectorWrite( stdout, "g(x) Chebyshev coefficients", b, n );
 
 	Chebyshev2Coeff( a, n, lower, upper, K );
-	MatrixWrite( stdout, "Chebyshev Coefficients for K(x,y)", a, n, n );
+	MatrixWrite( stdout, "K(x,y) Chebyshev coefficients", a, n, n );
+
 	Integrate( a, A, n, lambda, lower, upper );
-	MatrixWrite( stdout, "Matrix to be solved", A, n, n );
+	MatrixWrite( stdout, "A matrix", A, n, n );
+
 	det = MatrixSolve( n, A, x, b );
 
-    fprintf( stdout, "\tdeterminant = %9.6f\n\n", det );
+    fprintf( stdout, "\tdet|A| = %9.6f\n\n", det );
 
 	if ( det != 0.0 ) {
-		VectorWrite( stdout, "Chebyshev Coefficients for f(x)", x, n );
+		VectorWrite( stdout, "f(x) Chebyshev coefficients", x, n );
 		x[0]	*= 2.0;
 		Points( pt, M, x, n, lower, upper );
-		PointWrite( stdout, "Approximate f(x)", pt, M, f );
+		PointWrite( stdout, "f(x)", pt, M, f );
 	}
 
 	return( 0 );
@@ -545,12 +546,14 @@ PointWrite( FILE *fp, char *header, POINT pt[M], int n, double (*f)( double ) ) 
 	int	i	= 0;
 
 	fprintf( fp, "%s:\n\n", header );
+//    fprintf( fp, "\t-1.000000   1.000000   0.997352   0.002648" );
+    fprintf( fp, "\t     x         f(x)       p(x)   f(x)-p(x)\n\n" );
 
 	while ( i < n ) {
 		double	y	= (*f)( pt->x );
 		double	delta	= y - pt->y;
 
-		fprintf( fp, "\t[%3d]:  %9.6f", i, pt->x );
+		fprintf( fp, "\t%9.6f", pt->x );
 		fprintf( fp, "  %9.6f", y );
 		fprintf( fp, "  %9.6f", pt->y );
 		fprintf( fp, "  %9.6f", delta );

@@ -1,4 +1,6 @@
 /*
+ * Example 16 - Numerical Soution of Intergal Equations, pg 98
+ *
  * f(x) - (1/4) int [0,pi/2] x y f(y) dy = sin( x ) - x / 4
  *
  * f(x) = sin( x )
@@ -23,12 +25,12 @@ getLambda() {
 
 double
 g( double x ) {
-	return sin( x ) - x / 4.0;
+	return sin( x ) - 0.25 * x;
 }
 
 double
 K( double x, double y ) {
-	return x * y;
+    return x * y;
 }
 
 double

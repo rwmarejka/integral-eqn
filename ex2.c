@@ -1,4 +1,6 @@
 /*
+ * Example 2 - lambda = -1, range[0,2*pi], use trig functions
+ *
  * f(x) - int [0,2*pi] sin( x + 2 * y ) * f(y) dy = x
  *
  * f(x) = x - pi * cos(x) 

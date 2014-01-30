@@ -1,12 +1,16 @@
 /*
- * int [0,1] exp( x * y ) * f(y) dy = ( exp( x + 1 ) - 1 ) / ( x + 1 )
+ * Example 15 - Love's equation
  *
- * f(x) = exp( x )
+ *  f(x) + 1/pi int [-1,+1] f(y) * d / ( d ^ 2 + ( x - y ) ^2 ) dy = 1
+ *
+ *  f(x) = sum (i 0..n) a[i] * T[i](x)
+ *
+ * http://www.mathematica-journal.com/issue/v8i4/tricks/contents/Tricks8-4_2.html
  */
 
 #include <math.h>
 
-static double D = 0.5;
+static double D = 1.0;
 
 double
 getLower() {
@@ -30,7 +34,7 @@ g( double x ) {
 
 double
 K( double x, double y ) {
-    return 1.0 / ( D * D + ( x - y ) * ( x - y ) );
+    return D / ( D * D + ( x - y ) * ( x - y ) );
 }
 
 extern	double	ChebyshevEval( double, double [], int, double, double );

@@ -1,7 +1,6 @@
 /*
- * int [0,1] exp( x * y ) * f(y) dy = ( exp( x + 1 ) - 1 ) / ( x + 1 )
+ * Example 13 - Numerical Soution of Intergal Equations, pg 104
  *
- * f(x) = exp( x )
  */
 
 #include <math.h>

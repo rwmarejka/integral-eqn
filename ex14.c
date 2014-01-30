@@ -1,7 +1,6 @@
 /*
- * int [0,1] exp( x * y ) * f(y) dy = ( exp( x + 1 ) - 1 ) / ( x + 1 )
+ * Example 14 - Numerical Solution of Integral Equations, pg 102
  *
- * f(x) = exp( x )
  */
 
 #include <math.h>

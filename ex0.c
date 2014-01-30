@@ -1,4 +1,6 @@
 /*
+ * Example 0 - everything is 1, except g(x)=3
+ *
  * f(x) + int [-1,1] f(y) dy = 3
  *
  * f(x) = 1
