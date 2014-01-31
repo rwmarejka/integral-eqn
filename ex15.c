@@ -10,7 +10,7 @@
 
 #include <math.h>
 
-static double D = 1.0;
+static double d = 1.0;
 
 double
 getLower() {
@@ -29,14 +29,12 @@ getLambda() {
 
 double
 g( double x ) {
-	return 1.0;
+	return +1.0;
 }
 
 double
 K( double x, double y ) {
-    double diff = x - y;
-
-    return 1.0 / ( 1.0 + diff * diff );
+    return d / ( d * d + ( x - y ) * ( x - y ) );
 }
 
 extern	double	ChebyshevEval( double, double [], int, double, double );
@@ -58,7 +56,7 @@ f( double x ) {
 
     a[0]    *= 2.0;
 
-    return ChebyshevEval( x, a, N, -1.0, +1.0 );
+    return ChebyshevEval( x, a, N, getLower(), getUpper() );
 }
 
 int

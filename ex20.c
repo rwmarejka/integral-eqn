@@ -28,12 +28,14 @@ g( double x ) {
 
 double
 K( double x, double y ) {
-	return
-    1.0
-    + x             * y
-    + x * x         * y * y         / ( 1.0 * 2.0             )
-    + x * x * x     * y * y * y     / ( 1.0 * 2.0 * 3.0       )
-    + x * x * x * x * y * y * y * y / ( 1.0 * 2.0 * 3.0 * 4.0 );
+    return exp( x * y );
+
+//	return
+//   1.0
+//    + x             * y
+//    + x * x         * y * y         / ( 1.0 * 2.0             )
+//    + x * x * x     * y * y * y     / ( 1.0 * 2.0 * 3.0       )
+//    + x * x * x * x * y * y * y * y / ( 1.0 * 2.0 * 3.0 * 4.0 );
 }
 
 double

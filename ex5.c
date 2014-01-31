@@ -13,8 +13,8 @@
 static double d = -1.0;
 
 double
-getLambda() {
-	return -d / M_PI;
+getLower() {
+	return -1.0;
 }
 
 double
@@ -23,8 +23,8 @@ getUpper() {
 }
 
 double
-getLower() {
-	return -1.0;
+getLambda() {
+	return -d / M_PI;
 }
 
 double
