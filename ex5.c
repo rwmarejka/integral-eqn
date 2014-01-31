@@ -1,5 +1,5 @@
 /*
- * Love's equation
+ * Numerical Analysis Of Love's Integral Equation, Pilkington
  *
  *	f(x) - d/pi * int [-1,+1] f(y) / ( d^2 + ( x - y )^2 ) dy = atan( 1 + x ) + atan( 1 - x )
  *
@@ -10,11 +10,11 @@
 
 #include <math.h>
 
-static double D = -1.0;
+static double d = -1.0;
 
 double
 getLambda() {
-	return -D / M_PI;
+	return -d / M_PI;
 }
 
 double
@@ -34,7 +34,7 @@ g( double x ) {
 
 double
 K( double x, double y ) {
-	return 1.0 / ( D * D + ( x - y ) * ( x - y ) );
+	return 1.0 / ( d * d + ( x - y ) * ( x - y ) );
 }
 
 double

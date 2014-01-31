@@ -1,7 +1,7 @@
 /*
  * Example 15 - Love's equation
  *
- *  f(x) + 1/pi int [-1,+1] f(y) * d / ( d ^ 2 + ( x - y ) ^2 ) dy = 1
+ *  f(x) - 1/pi int [-1,+1] f(y) * d / ( d ^ 2 + ( x - y ) ^2 ) dy = 1
  *
  *  f(x) = sum (i 0..n) a[i] * T[i](x)
  *
@@ -24,7 +24,7 @@ getUpper() {
 
 double
 getLambda() {
-	return -D / M_PI;
+	return -1.0 / M_PI;
 }
 
 double
@@ -34,7 +34,9 @@ g( double x ) {
 
 double
 K( double x, double y ) {
-    return D / ( D * D + ( x - y ) * ( x - y ) );
+    double diff = x - y;
+
+    return 1.0 / ( 1.0 + diff * diff );
 }
 
 extern	double	ChebyshevEval( double, double [], int, double, double );

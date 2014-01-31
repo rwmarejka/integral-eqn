@@ -1,7 +1,6 @@
 /*
- * f(x) - int[0,1] |x-y| * f(y) dy = -( 2 * x^3 - 9 * x + 2 ) / 6
+ * Example 21 - The Mathematica Journal 9:2 2004, Integral Equations by Stan Richardson
  *
- * f(x) = x
  */
 
 #include <math.h>
@@ -13,27 +12,27 @@ getLower() {
 
 double
 getUpper() {
-	return 1.0;
+	return +1.0;
 }
 
 double
 getLambda() {
-	return -1.0;
+	return -0.5;
 }
 
 double
 g( double x ) {
-	return -( 2.0 * x * x * x - 9.0 * x + 2.0 ) / 6.0;
+	return exp( -x ) - 0.5 + 0.5 * exp( -( x + 1.0 ) );
 }
 
 double
 K( double x, double y ) {
-	return fabs( x - y );
+	return ( x + 1.0 ) * exp( - x * y );
 }
 
 double
 f( double x ) {
-	return x;
+	return exp( -x );
 }
 
 int
