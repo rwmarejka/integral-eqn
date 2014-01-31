@@ -10,7 +10,7 @@ static double d = +1.0;
 
 double
 getLower() {
-	return -1.0;
+    return -1.0;
 }
 
 double
