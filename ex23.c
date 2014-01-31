@@ -1,5 +1,6 @@
 /*
- * Example - Solving Fredholm Equations of the Second Kind in MATLAB, pg 10
+ * Example - The Classical Theory of Integral Equations: A Concise Treatment
+ *             Chapter 2 -  Feedholm Intergal Equations of the Second Kind (General Kernel), pg 71
  *
  */
 
@@ -17,29 +18,32 @@ getUpper() {
 
 double
 getLambda() {
-	return -1.0;
+	return -0.5;
 }
 
 double
 g( double x ) {
-	return ( 1.0 - 1.0 / ( M_PI * M_PI ) ) * sin( M_PI * x );
+	return cos( x );
 }
 
 double
-K( double s, double t ) {
-    double z;
-
-    if ( s <= t )
-        z   = s * ( 1.0 - t );
-    else
-        z   = t * ( 1.0 - s );
-
-	return z;
+K( double x, double y ) {
+	return cos( x * y );
 }
 
 double
 f( double x ) {
-	return sin( M_PI * x );
+    double x2 = x * x;
+    double x4 = x2 * x2;
+    double y;
+
+    y =   (   11532090.0 /        6397711.0 )
+        - (    7944195.0 /       12795422.0 ) * x2
+        + (     607005.0 /       12795422.0 ) * x4
+        + ( 1620362251.0 /  1064067293520.0 ) * x4 * x2
+        + ( 1473509027.0 / 55331499263040.0 ) * x4 * x4;
+
+	return y;
 }
 
 int

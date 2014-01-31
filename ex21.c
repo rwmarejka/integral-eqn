@@ -1,5 +1,6 @@
 /*
- * Example - The Mathematica Journal 9:2 2004, Integral Equations by Stan Richardson
+ * Example - The Classical Theory of Integral Equations: A Concise Treatment
+ *             Chapter 2 -  Feedholm Intergal Equations of the Second Kind (General Kernel), pg 81
  *
  */
 
@@ -7,7 +8,7 @@
 
 double
 getLower() {
-	return 0.0;
+	return -1.0;
 }
 
 double
@@ -22,17 +23,31 @@ getLambda() {
 
 double
 g( double x ) {
-	return exp( -x ) - 0.5 + 0.5 * exp( -( x + 1.0 ) );
+	return x * x * x;
 }
 
 double
 K( double x, double y ) {
-	return ( x + 1.0 ) * exp( - x * y );
+	return sin( 0.5 * M_PI * x * y );
 }
 
 double
 f( double x ) {
-	return exp( -x );
+    double x2 = x * x;
+    double x4 = x2 * x2;
+    double a[] = {
+        +0.0,
+        +0.565420,
+        +0.0,
+        +0.847750,
+        +0.0,
+        +0.014041,
+    };
+#define NTERMS (sizeof(a)/sizeof(a[0]))
+
+    double y = a[1] * x + a[3] * x2 * x + a[5] * x4 * x;
+
+	return y;
 }
 
 int

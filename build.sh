@@ -2,20 +2,20 @@
 
 LIBS=-lm
 cc -c int.c
-cc -o ex0 ex0.c int.o $LIBS
-cc -o ex1 ex1.c int.o $LIBS
-cc -o ex2 ex2.c int.o $LIBS
-cc -o ex5 ex5.c int.o $LIBS
-cc -o ex6 ex6.c int.o $LIBS
+cc -o ex00 ex00.c int.o $LIBS
+cc -o ex01 ex01.c int.o $LIBS
+cc -o ex02 ex02.c int.o $LIBS
+cc -o ex11 ex11.c int.o $LIBS
+cc -o ex12 ex12.c int.o $LIBS
 cc -o ex13 ex13.c int.o $LIBS
-cc -o ex14 ex14.c int.o $LIBS
-cc -o ex15 ex15.c int.o $LIBS
-cc -o ex16 ex16.c int.o $LIBS
-cc -o ex17 ex17.c int.o $LIBS
-cc -o ex18 ex18.c int.o $LIBS
-cc -o ex19 ex19.c int.o $LIBS
-cc -o ex20 ex20.c int.o $LIBS
 cc -o ex21 ex21.c int.o $LIBS
 cc -o ex22 ex22.c int.o $LIBS
 cc -o ex23 ex23.c int.o $LIBS
 cc -o ex24 ex24.c int.o $LIBS
+cc -o ex25 ex25.c int.o $LIBS
+cc -o ex31 ex31.c int.o $LIBS
+cc -o ex41 ex41.c int.o $LIBS
+cc -o ex42 ex42.c int.o $LIBS
+cc -o ex43 ex43.c int.o $LIBS
+cc -o ex51 ex51.c int.o $LIBS
+cc -o ex52 ex52.c int.o $LIBS
