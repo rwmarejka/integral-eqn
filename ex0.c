@@ -1,23 +1,9 @@
 /*
- * Example 0 - everything is 1, except g(x)=3
- *
- * f(x) + int [-1,1] f(y) dy = 3
- *
- * f(x) = 1
+ * QA Test 0 - everything is 1, except g(x)=3
  *
  */
 
 #include <math.h>
-
-double
-getLambda() {
-	return 1.0;
-}
-
-double
-getUpper() {
-	return 1.0;
-}
 
 double
 getLower() {
@@ -25,18 +11,28 @@ getLower() {
 }
 
 double
+getUpper() {
+	return +1.0;
+}
+
+double
+getLambda() {
+	return +1.0;
+}
+
+double
 g( double x ) {
-	return 3.0;
+	return +3.0;
 }
 
 double
 K( double x, double y ) {
-	return 1.0;
+	return +1.0;
 }
 
 double
 f( double x ) {
-	return 1.0;
+	return +1.0;
 }
 
 int

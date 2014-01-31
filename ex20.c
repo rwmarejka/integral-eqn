@@ -1,5 +1,5 @@
 /*
- * Example 6 - The Classical Theory of Integral Equations: A Concise Treatment
+ * Example - The Classical Theory of Integral Equations: A Concise Treatment
  *             Chapter 2 -  Feedholm Intergal Equations of the Second Kind (General Kernel), pg 43
  *
  */
@@ -29,13 +29,6 @@ g( double x ) {
 double
 K( double x, double y ) {
     return exp( x * y );
-
-//	return
-//   1.0
-//    + x             * y
-//    + x * x         * y * y         / ( 1.0 * 2.0             )
-//    + x * x * x     * y * y * y     / ( 1.0 * 2.0 * 3.0       )
-//    + x * x * x * x * y * y * y * y / ( 1.0 * 2.0 * 3.0 * 4.0 );
 }
 
 double

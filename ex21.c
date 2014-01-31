@@ -1,5 +1,5 @@
 /*
- * Example 21 - The Mathematica Journal 9:2 2004, Integral Equations by Stan Richardson
+ * Example - The Mathematica Journal 9:2 2004, Integral Equations by Stan Richardson
  *
  */
 

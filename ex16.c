@@ -1,5 +1,5 @@
 /*
- * Example 16 - Numerical Soution of Intergal Equations, pg 98
+ * Example - Numerical Soution of Intergal Equations, pg 98
  *
  * f(x) - (1/4) int [0,pi/2] x y f(y) dy = sin( x ) - x / 4
  *

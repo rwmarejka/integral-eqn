@@ -1,5 +1,5 @@
 /*
- * Example 13 - Numerical Soution of Intergal Equations, pg 104
+ * Example - Numerical Soution of Intergal Equations, pg 104
  *
  */
 
@@ -12,12 +12,12 @@ getLower() {
 
 double
 getUpper() {
-	return 1.0;
+	return +1.0;
 }
 
 double
 getLambda() {
-	return 1.0;
+	return +1.0;
 }
 
 double

@@ -1,5 +1,5 @@
 /*
- * Example 14 - Numerical Solution of Integral Equations, pg 102
+ * Example - Numerical Solution of Integral Equations, pg 102
  *
  */
 
@@ -12,12 +12,12 @@ getLower() {
 
 double
 getUpper() {
-	return 1.0;
+	return +1.0;
 }
 
 double
 getLambda() {
-	return 1.0;
+	return +1.0;
 }
 
 double
@@ -36,7 +36,7 @@ K( double x, double y ) {
 
 double
 f( double x ) {
-    return 7.0 * exp( 1.0 ) * ( exp( x ) - exp( -x ) ) / ( exp( 2.0 ) - 1.0 ) - 6.0 * x;
+    return +7.0 * exp( 1.0 ) * ( exp( x ) - exp( -x ) ) / ( exp( 2.0 ) - 1.0 ) - 6.0 * x;
 }
 
 int

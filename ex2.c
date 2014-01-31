@@ -1,26 +1,23 @@
 /*
- * Example 2 - lambda = -1, range[0,2*pi], use trig functions
+ * QA Test 2 - lambda = -1, range[0,2*pi], use trig functions
  *
- * f(x) - int [0,2*pi] sin( x + 2 * y ) * f(y) dy = x
- *
- * f(x) = x - pi * cos(x) 
  */
 
 #include <math.h>
 
 double
-getLambda() {
-	return -1.0;
+getLower() {
+	return 0.0;
 }
 
 double
 getUpper() {
-	return 2.0 * M_PI;
+	return +2.0 * M_PI;
 }
 
 double
-getLower() {
-	return 0.0;
+getLambda() {
+	return -1.0;
 }
 
 double

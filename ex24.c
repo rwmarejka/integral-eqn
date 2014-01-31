@@ -1,12 +1,12 @@
 /*
- * Example 24 - Numerical Solution Of Non-Singular Fredholm Integral Equations Of
+ * Example - Numerical Solution Of Non-Singular Fredholm Integral Equations Of
  *              The Second Kind, Sastry, 1973.
  *
  */
 
 #include <math.h>
 
-static double d = 1.0;
+static double d = +1.0;
 
 double
 getLower() {

@@ -1,17 +1,13 @@
 /*
- * Example 1 - lambda = 1, range [0,pi], use trig functions
- *
- * f(x) + int [0,pi] cos(x) * cos(y) * f(y) dy = (1 + pi/2) * cos(x);
- *
- * f(x) = cos(x)
+ * QA Test 1 - lambda = 1, range [0,pi], use trig functions
  *
  */
 
 #include <math.h>
 
 double
-getLambda() {
-	return 1.0;
+getLower() {
+	return 0.0;
 }
 
 double
@@ -20,13 +16,13 @@ getUpper() {
 }
 
 double
-getLower() {
-	return 0.0;
+getLambda() {
+	return +1.0;
 }
 
 double
 g( double x ) {
-	return ( 1 + M_PI / 2.0 ) * cos( x );
+	return ( +1.0 + M_PI / 2.0 ) * cos( x );
 }
 
 double

@@ -1,5 +1,5 @@
 /*
- * Example 6 - The Classical Theory of Integral Equations: A Concise Treatment
+ * Example - The Classical Theory of Integral Equations: A Concise Treatment
  *             Chapter 2 -  Feedholm Intergal Equations of the Second Kind (General Kernel), pg 71
  *
  */
@@ -13,7 +13,7 @@ getLower() {
 
 double
 getUpper() {
-	return 1.0;
+	return +1.0;
 }
 
 double

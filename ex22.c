@@ -1,5 +1,5 @@
 /*
- * Example 22 - Solving Fredholm Equations of the Second Kind in MATLAB, pg 10
+ * Example - Solving Fredholm Equations of the Second Kind in MATLAB, pg 10
  *
  */
 
