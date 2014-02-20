@@ -52,8 +52,6 @@ f( double x ) {
     };
 #define N   (sizeof(a)/sizeof(a[0]))
 
-    a[0]    *= 2.0;
-
     return ChebyshevEval( x, a, N, getLower(), getUpper() );
 }
 

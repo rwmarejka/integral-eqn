@@ -101,13 +101,12 @@ main( int argc, char *argv[] ) {
 	fprintf( stdout, "lambda: %9.6f, %9.6f <= x <= %9.6f\n\n", lambda, lower, upper );
 
 	ChebyshevCoeff( b, n, lower, upper, g );
-	b[0]	*= 0.5;
 	VectorWrite( stdout, "g(x) Chebyshev coefficients", b, n );
 
 	Chebyshev2Coeff( a, n, lower, upper, K );
 	MatrixWrite( stdout, "K(x,y) Chebyshev coefficients", a, n, n );
 
-    {
+    if ( 1 ) {
         POINT grid[M][M];
 
         Points2( grid, M, a, n, lower, upper );
@@ -123,7 +122,6 @@ main( int argc, char *argv[] ) {
 
 	if ( det != 0.0 ) {
 		VectorWrite( stdout, "f(x) Chebyshev coefficients", x, n );
-		x[0]	*= 2.0;
 		Points( pt, M, x, n, lower, upper );
 		PointWrite( stdout, "f(x)", pt, M, f );
 	}
@@ -146,12 +144,14 @@ ChebyshevCoeff( VECTOR a, unsigned n, double lower, double upper, double (*f)( d
         Y[i]    = (*f)( X[i] );
     }
 
-    Y[n]    *= 0.5;                     /* half the last term       */
+    Y[0]    *= 0.5;                     /* half first and last term         */
+    Y[n]    *= 0.5;
 
     for ( i=0; i <= n; ++i )
         a[i]    = factor * ChebyshevEval( X[i], Y, np1, lower, upper );
 
-    a[n]    *= 0.5;                     /* half the last term       */
+    a[0]    *= 0.5;                     /* half first and last term         */
+    a[n]    *= 0.5;
 
 	return;
 }
@@ -176,7 +176,8 @@ Chebyshev2Coeff( MATRIX a, unsigned n, double lower, double upper, double (*f)( 
 		for ( ; j <= n; ++j )
 			K[i][j]	= (*f)( Xi, X[j] );
 
-		K[i][n]	*= 0.5;                 /* half the last term       */
+        K[i][0] *= 0.5;                 /* half first and last term         */
+		K[i][n]	*= 0.5;
 	}
 
 	for ( i=0; i <= n; ++i ) {          /* compute K matrix         */
@@ -191,7 +192,8 @@ Chebyshev2Coeff( MATRIX a, unsigned n, double lower, double upper, double (*f)( 
 			for ( ; k <= n; ++k )
 				b[k]	 = ChebyshevEval( Xj, K[k], np1, lower, upper );
 
-			b[n]	*= 0.5;             /* half the last term       */
+            b[0]    *= 0.5;             /* half first and last term         */
+			b[n]	*= 0.5;
 			a[i][j]	 = factor * ChebyshevEval( Xi, b, np1, lower, upper );
 		}
 	}
@@ -221,35 +223,23 @@ ChebyshevEval( double x, VECTOR a, unsigned n, double lower, double upper ) {
 		c0	= mul * c1 - c2 + a[n];
 	}
 
-	return( 0.5 * ( c0 - c2 ) );
+	return( 0.5 * ( c0 - c2 + a[0] ) );
 }
 
-/*	ChebyshevEval - evaluate a two-dimensional Chebyshev series at a point		*/
+/*	Chebyshev2Eval - evaluate a two-dimensional Chebyshev series at a point		*/
 
 double
 Chebyshev2Eval( double x, double y, MATRIX K, unsigned n, double lower, double upper ) {
     unsigned i = 0;
     VECTOR   b;
 
-    for ( ; i < n; ++i ) {
-        /*
-         * ChebyshevEval expects the series be single-prime (i.e. weight for 1st term is 1/2).
-         * The K matrix uses equal weight. Therefore, need to double first term - K[i][0] to
-         * satisfy ChebyshevEval.
-         */
-        double k0 = K[i][0];
-
-        K[i][0] += k0;
+    for ( ; i < n; ++i )
         b[i]     = ChebyshevEval( y, K[i], n, lower, upper );
-        K[i][0]  = k0;
-    }
-
-    b[0] *= 2.0;
 
     return ChebyshevEval( x, b, n, lower, upper );
 }
 
-/*	Integrate - computes the matrix [ I + lambda * K * T ]						*/
+/*	Integrate - computes the matrix [ I + lambda * k * t ]						*/
 
 	void
 Integrate( MATRIX b, MATRIX d, unsigned n, double lambda, double lower, double upper ) {

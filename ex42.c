@@ -38,7 +38,7 @@ extern	double	ChebyshevEval( double, double [], int, double, double );
 double
 f( double x ) {
     double a[] = {
-        +1.4151850,
+        +1.4151850 * 0.5,
         +0.0,
         +0.0493851,
         +0.0,
