@@ -49,21 +49,24 @@ typedef struct {
 
 /* External References		*/
 
-extern	void	ChebyshevCoeff( VECTOR, int, double, double, double (*)( double ) );
-extern	void	Chebyshev2Coeff( MATRIX, int, double, double, double (*)( double, double ) );
-extern	double	ChebyshevEval( double, VECTOR, int, double, double );
+extern	void	ChebyshevCoeff( VECTOR, unsigned, double, double, double (*)( double ) );
+extern	double	ChebyshevEval( double, VECTOR, unsigned, double, double );
+extern	void	Points( POINT [M], unsigned, VECTOR, unsigned, double, double );
+extern	int     PointWrite( FILE *, char *, POINT [M], unsigned, double (*)( double ) );
+extern	int     VectorWrite( FILE *, char *, VECTOR, unsigned );
 
-extern	void	Integrate( MATRIX, MATRIX, int, double, double, double );
-extern	void	Points( POINT [M], int, VECTOR, int, double, double );
+extern	void	Chebyshev2Coeff( MATRIX, unsigned, double, double, double (*)( double, double ) );
+extern  double  Chebyshev2Eval( double, double, MATRIX, unsigned, double, double );
+extern  void    Points2( POINT [M][M], unsigned, MATRIX, unsigned, double, double );
+extern  int     Point2Write( FILE *, char *, POINT [M][M], unsigned, double (*)( double, double ) );
 
-extern	double	MatrixSolve( int, MATRIX, VECTOR, VECTOR );
-extern	double	MatrixLUdecomp( int, MATRIX, int [N] );
-extern	double	MatrixLUdeterminant( int, MATRIX, int [N] );
-extern	void	MatrixLUsolve( int, MATRIX, VECTOR, int [N] );
+extern	void	Integrate( MATRIX, MATRIX, unsigned, double, double, double );
 
-extern	int     VectorWrite( FILE *, char *, VECTOR, int );
-extern	int     MatrixWrite( FILE *, char *, MATRIX, int, int );
-extern	int     PointWrite( FILE *, char *, POINT [M], int, double (*)( double ) );
+extern	double	MatrixSolve( unsigned, MATRIX, VECTOR, VECTOR );
+extern	double	MatrixLUdecomp( unsigned, MATRIX, int [N] );
+extern	double	MatrixLUdeterminant( unsigned, MATRIX, int [N] );
+extern	void	MatrixLUsolve( unsigned, MATRIX, VECTOR, int [N] );
+extern	int     MatrixWrite( FILE *, char *, MATRIX, unsigned, unsigned );
 
 extern	double	getLower( void );
 extern	double	getUpper( void );
@@ -79,19 +82,19 @@ extern  int     fredholm( void );
 
 int
 main( int argc, char *argv[] ) {
-	VECTOR	x, b;
-	MATRIX	a, A;
-	POINT	pt[M];
-	double	upper   = getUpper();
-	double	lower   = getLower();
-	double	lambda  = getLambda();
-    double  det;
-	int	n;
+	VECTOR	 x, b;
+	MATRIX	 a, A;
+	POINT	 pt[M];
+	double	 upper   = getUpper();
+	double	 lower   = getLower();
+	double	 lambda  = getLambda();
+    double   det;
+	unsigned n;
 
 	if ( argc > 1 )
 		n	= atoi( argv[1] );
 	else
-		n	= N;
+		n	= N - 1;
 
 	assert( n <= N );
 
@@ -103,6 +106,13 @@ main( int argc, char *argv[] ) {
 
 	Chebyshev2Coeff( a, n, lower, upper, K );
 	MatrixWrite( stdout, "K(x,y) Chebyshev coefficients", a, n, n );
+
+    {
+        POINT grid[M][M];
+
+        Points2( grid, M, a, n, lower, upper );
+        Point2Write( stdout, "K(x,y)", grid, M, K );
+    }
 
 	Integrate( a, A, n, lambda, lower, upper );
 	MatrixWrite( stdout, "A matrix", A, n, n );
@@ -124,12 +134,12 @@ main( int argc, char *argv[] ) {
 /*	ChebyshevCoeff - generate Chebyshev coefficients to f(x)	*/
 
 	void
-ChebyshevCoeff( VECTOR a, int n, double lower, double upper, double (*f)( double ) ) {
-    int     i       = 0;
-    int     np1     = n--;
-    double  factor  = 2.0 / n;
-    VECTOR  X;
-    VECTOR  Y;
+ChebyshevCoeff( VECTOR a, unsigned n, double lower, double upper, double (*f)( double ) ) {
+    unsigned i      = 0;
+    unsigned np1    = n--;
+    double   factor = 2.0 / n;
+    VECTOR   X;
+    VECTOR   Y;
 
     for ( ; i <= n; ++i ) {             /* compute the abscissa and f(x)    */
         X[i]    = XK( i, n, lower, upper );
@@ -149,19 +159,19 @@ ChebyshevCoeff( VECTOR a, int n, double lower, double upper, double (*f)( double
 /*	Chebyshev2Coeff - generate Chebyshev coefficients to K(x,y)	*/
 
 	void
-Chebyshev2Coeff( MATRIX a, int n, double lower, double upper, double (*f)( double, double ) ) {
-	int     i   = 0;
-	int     np1 = n--;
-    double  factor = 4.0 / ( n * n );
-    VECTOR  X;
-	MATRIX	K;
+Chebyshev2Coeff( MATRIX a, unsigned n, double lower, double upper, double (*f)( double, double ) ) {
+	unsigned i      = 0;
+	unsigned np1    = n--;
+    double   factor = 4.0 / ( n * n );
+    VECTOR   X;
+	MATRIX	 K;
 
 	for ( ; i <= n; ++i )               /* compute the abscissa     */
 		X[i] = XK( i, n, lower, upper );
 
 	for ( i=0; i <= n; ++i ) {			/* compute K(x,y)           */
-		int     j   = 0;
-        double  Xi  = X[i];
+		unsigned j  = 0;
+        double   Xi = X[i];
 
 		for ( ; j <= n; ++j )
 			K[i][j]	= (*f)( Xi, X[j] );
@@ -170,13 +180,13 @@ Chebyshev2Coeff( MATRIX a, int n, double lower, double upper, double (*f)( doubl
 	}
 
 	for ( i=0; i <= n; ++i ) {          /* compute K matrix         */
-		int     j   = 0;
-		double	Xi	= X[i];
+		unsigned j  = 0;
+		double	 Xi	= X[i];
 
 		for ( ; j <= n; ++j ) {
-			int     k   = 0;
-			VECTOR	b;
-            double  Xj  = X[j];
+			unsigned k  = 0;
+			VECTOR	 b;
+            double   Xj = X[j];
 
 			for ( ; k <= n; ++k )
 				b[k]	 = ChebyshevEval( Xj, K[k], np1, lower, upper );
@@ -186,7 +196,7 @@ Chebyshev2Coeff( MATRIX a, int n, double lower, double upper, double (*f)( doubl
 		}
 	}
 
-	for ( i=0; i <= n; ++i ) {          /* half the last terms      */
+	for ( i=0; i <= n; ++i ) {          /* half the first and last terms */
 		a[0][i]	*= 0.5;
 		a[i][0]	*= 0.5;
 		a[n][i]	*= 0.5;
@@ -199,7 +209,7 @@ Chebyshev2Coeff( MATRIX a, int n, double lower, double upper, double (*f)( doubl
 /*	ChebyshevEval - evaluate a Chebyshev series at a point		*/
 
 	double
-ChebyshevEval( double x, VECTOR a, int n, double lower, double upper ) {
+ChebyshevEval( double x, VECTOR a, unsigned n, double lower, double upper ) {
 	double	c0	= 0.0;
 	double	c1	= 0.0;
 	double	c2	= 0.0;
@@ -214,35 +224,60 @@ ChebyshevEval( double x, VECTOR a, int n, double lower, double upper ) {
 	return( 0.5 * ( c0 - c2 ) );
 }
 
-/*	Integrate							*/
+/*	ChebyshevEval - evaluate a two-dimensional Chebyshev series at a point		*/
+
+double
+Chebyshev2Eval( double x, double y, MATRIX K, unsigned n, double lower, double upper ) {
+    unsigned i = 0;
+    VECTOR   b;
+
+    for ( ; i < n; ++i ) {
+        /*
+         * ChebyshevEval expects the series be single-prime (i.e. weight for 1st term is 1/2).
+         * The K matrix uses equal weight. Therefore, need to double first term - K[i][0] to
+         * satisfy ChebyshevEval.
+         */
+        double k0 = K[i][0];
+
+        K[i][0] += k0;
+        b[i]     = ChebyshevEval( y, K[i], n, lower, upper );
+        K[i][0]  = k0;
+    }
+
+    b[0] *= 2.0;
+
+    return ChebyshevEval( x, b, n, lower, upper );
+}
+
+/*	Integrate - computes the matrix [ I + lambda * K * T ]						*/
 
 	void
-Integrate( MATRIX b, MATRIX d, int n, double lambda, double lower, double upper ) {
-	int     i       = 0;
-	double	factor	= lambda * ( upper - lower ) / 2.0;
-	MATRIX	t;
+Integrate( MATRIX b, MATRIX d, unsigned n, double lambda, double lower, double upper ) {
+	unsigned i      = 0;
+	double	 factor	= lambda * ( upper - lower ) / 2.0;
+	MATRIX	 t;
 
 	for ( ; i < n; ++i ) {                      /* compute t                    */
-		int	j	= ( i % 2 )? 1 : 0;
-		int	k	= ( i % 2 )? 0 : 1;
+		unsigned j = ( i % 2 )? 1 : 0;
+		unsigned k = ( i % 2 )? 0 : 1;
 
 		for ( ; k < n; k+=2 )
 			t[i][k]	= 0.0;
 
 		for ( ; j < n; j+=2 ) {
-			int	diff	= i - j;
-			int	sum     = i + j;
+			int	diff = i - j;
+			int	sum  = i + j;
 
 			t[i][j]	= -( 1.0 / ( sum * sum - 1 ) + 1.0 / ( diff * diff - 1 ) );
 		}
 	}
 
 	for ( i=0; i < n; ++i ) {                   /* d = b * t                    */
-		int	j   = 0;
+		unsigned j   = 0;
 
 		for ( ; j < n; ++j ) {
-			int     k   = 1;
-			double	sum	= b[i][0] * t[0][j];
+			unsigned k   = 1;
+			double	 sum = b[i][0] * t[0][j];
 
 			for ( ; k < n; ++k )
 				sum	+= b[i][k] * t[k][j];
@@ -257,24 +292,49 @@ Integrate( MATRIX b, MATRIX d, int n, double lambda, double lower, double upper 
 	return;
 }
 
-/*	Points - generate N points from the Chebyshev coefficients to f(x).	*/
+/*	Points - evaluate the Chebyshev approximation to f(x) at M points in the interval. */
 
 	void
-Points( POINT pt[M], int m, VECTOR a, int n, double lower, double upper ) {
-	int     i	= 0;
-	double	dx	= ( upper - lower ) / ( m - 1 );
+Points( POINT pt[M], unsigned m, VECTOR a, unsigned n, double lower, double upper ) {
+	unsigned i  = 0;
+    double   x  = lower;
+	double   dx = ( upper - lower ) / ( m - 1 );
 
 	for ( ; i < m; ++i, ++pt ) {
-		pt->x	= lower + i * dx;
-		pt->y	= ChebyshevEval( pt->x, a, n, lower, upper );
+        pt->x  = x;
+		pt->y  = ChebyshevEval( x, a, n, lower, upper );
+        x 	  += dx;
 	}
 	return;
+}
+
+/*	Points - evaluate the Chebyshev approximation to K(x,y) at M points in the interval. */
+
+    void
+Points2( POINT grid[M][M], unsigned m, MATRIX K, unsigned n, double lower, double upper ) {
+    unsigned i  = 0;
+    double   x  = lower;
+    double   dx = ( upper - lower ) / ( m - 1 );
+
+    for ( ; i < m; ++i ) {
+        unsigned j = 0;
+        double   y = lower;
+
+        for ( ; j < m; ++j ) {
+            grid[i][j].x = x;
+            grid[i][j].y = y;
+            grid[i][j].z = Chebyshev2Eval( x, y, K, n, lower, upper );
+            y += dx;
+        }
+        x += dx;
+    }
+    return;
 }
 
 /*	MatrixSolve - solve a system of linear equations	*/
 
 	double
-MatrixSolve( int n, MATRIX a, VECTOR x, VECTOR b ) {
+MatrixSolve( unsigned n, MATRIX a, VECTOR x, VECTOR b ) {
 	int     ipvt[N];	/* the pivot vector		*/
 	double	status;		/* indicates singularity	*/
 /*
@@ -283,7 +343,7 @@ MatrixSolve( int n, MATRIX a, VECTOR x, VECTOR b ) {
 	status	= MatrixLUdecomp( n, a, ipvt );
 
 	if ( status != 0.0 ) {		/* check status of system	*/
-		int	i   = 0;
+		int i   = 0;
 
 		for ( ; i < n; ++i )
 			x[i]	= b[i];
@@ -299,16 +359,16 @@ MatrixSolve( int n, MATRIX a, VECTOR x, VECTOR b ) {
 /*	MatrixLUsolve - solve by back substitution.	*/
 
 	void
-MatrixLUsolve( int n, MATRIX a, VECTOR b, int ipvt[N] ) {
+MatrixLUsolve( unsigned n, MATRIX a, VECTOR b, int ipvt[N] ) {
 	if ( n != 1 ) {			/* if not the trivial case	*/
-        int     k   = 0;
-        int     i;
-        double  t;
+        int    k  = 0;
+        int    i;
+        double t;
 /*
  * Forward elimination...
  */
 		for ( ; k < (n-1); ++k ) {
-			int     m	= ipvt[k];
+			int m = ipvt[k];
 
 			_exchange( b[k], b[m] );
 			t	= b[k];
@@ -336,19 +396,19 @@ MatrixLUsolve( int n, MATRIX a, VECTOR b, int ipvt[N] ) {
 /*	MatrixLUdecompDECOMP - reduce matrix to upper triangular.	*/
 
 	double
-MatrixLUdecomp( int n, MATRIX a, int ipvt[N] ) {
+MatrixLUdecomp( unsigned n, MATRIX a, int ipvt[N] ) {
     double  status;
 
 	ipvt[n-1] = 1;
 
 	if ( n != 1 ) {
-        int     i;
-        int     k       = 0;
-        double	t;
-        double	anorm	= 0.0;
-        double	ynorm	= 0.0;
-        double	znorm	= 0.0;
-        VECTOR	work;
+        int    i;
+        int    k     = 0;
+        double t;
+        double anorm = 0.0;
+        double ynorm = 0.0;
+        double znorm = 0.0;
+        VECTOR work;
 /*
  * Compute 1-norm of a
  */
@@ -364,8 +424,8 @@ MatrixLUdecomp( int n, MATRIX a, int ipvt[N] ) {
  * Gaussian elimination with partial pivoting
  */
 		for ( k=0; k < (n-1); ++k ) {
-            int j;
-            int m = k;
+            unsigned j;
+            unsigned m = k;
 /*
  * Find the pivot...
  */
@@ -433,7 +493,7 @@ MatrixLUdecomp( int n, MATRIX a, int ipvt[N] ) {
 		}
 
 		for ( k=(n-2); k >= 0; --k ) {
-            int m;
+            unsigned m;
 
 			t	= 0.0;
 
@@ -482,9 +542,9 @@ MatrixLUdecomp( int n, MATRIX a, int ipvt[N] ) {
  */
 
 	double
-MatrixLUdeterminant( int n, MATRIX a, int ipvt[N] ) {
-    int     i	= 0;
-    double	r	= ipvt[n-1];
+MatrixLUdeterminant( unsigned n, MATRIX a, int ipvt[N] ) {
+    unsigned i = 0;
+    double	 r = ipvt[n-1];
 
 	for ( ; i < n; ++i )
 		r	*= a[i][i];
@@ -495,8 +555,8 @@ MatrixLUdeterminant( int n, MATRIX a, int ipvt[N] ) {
 /*	VectorWrite - write a vector to a file.				*/
 
 	int
-VectorWrite( FILE *fp, char *header, VECTOR a, int n ) {
-	int	i   = 0;
+VectorWrite( FILE *fp, char *header, VECTOR a, unsigned n ) {
+	unsigned i = 0;
 
 	fprintf( fp, "%s:\n\n", header );
 
@@ -511,8 +571,8 @@ VectorWrite( FILE *fp, char *header, VECTOR a, int n ) {
 /*	MatrixWrite - write a matrix to a file.				*/
 
 	int
-MatrixWrite( FILE *fp, char *header, MATRIX a, int n, int m ) {
-	int	i   = 0;
+MatrixWrite( FILE *fp, char *header, MATRIX a, unsigned n, unsigned m ) {
+	unsigned i = 0;
 
 	if ( ( n > 10 ) || ( m > 10 ) )
 		return( ferror( fp ) );
@@ -520,7 +580,7 @@ MatrixWrite( FILE *fp, char *header, MATRIX a, int n, int m ) {
 	fprintf( fp, "%s:\n\n", header );
 
 	for ( ; i < n; ++i ) {
-		int	j	= 0;
+		unsigned j = 0;
 
 		fputc( '\t', fp );
 
@@ -539,15 +599,15 @@ MatrixWrite( FILE *fp, char *header, MATRIX a, int n, int m ) {
 	return( ferror( fp ) );
 }
 
-/*	PointWrite - write an array of (x,y) to a file.			*/
+/*	PointWrite - write point vector f(x) to a file.			*/
 
 	int
-PointWrite( FILE *fp, char *header, POINT pt[M], int n, double (*f)( double ) ) {
-	int	i	= 0;
+PointWrite( FILE *fp, char *header, POINT pt[M], unsigned n, double (*f)( double ) ) {
+	unsigned i = 0;
 
 	fprintf( fp, "%s:\n\n", header );
-//    fprintf( fp, "\t-1.000000   1.000000   0.997352   0.002648" );
-    fprintf( fp, "\t     x         f(x)       p(x)   f(x)-p(x)\n\n" );
+    fprintf( fp, "\t x          f(x)       f*(x)      f-f*\n\n" );
+//  fprintf( fp, "\t-1.000000   1.000000   0.997352   0.002648" );
 
 	while ( i < n ) {
 		double	y	= (*f)( pt->x );
@@ -564,5 +624,37 @@ PointWrite( FILE *fp, char *header, POINT pt[M], int n, double (*f)( double ) ) 
 
 	fputc( '\n', fp );
 
+	return( ferror( fp ) );
+}
+
+/*	PointWrite - write the point grid for K(x,y) to a file.			*/
+
+int
+Point2Write( FILE *fp, char *header, POINT pt[M][M], unsigned n, double (*f)( double, double ) ) {
+	unsigned i = 0;
+
+	fprintf( fp, "%s:\n\n", header );
+    fprintf( fp, "\t x          y          K(x,y)     K*(x,y)    K-K*\n\n" );
+//  fprintf( fp, "\t-1.000000   1.000000   0.997352   0.997352   0.002648" );
+
+	for ( ; i < n; ++i ) {
+        unsigned j = 0;
+
+        for ( ; j < n; ++j ) {
+            double	z	    = (*f)( pt[i][j].x, pt[i][j].y );
+            double	delta	= z - pt[i][j].z;
+
+            fprintf( fp, "\t%9.6f", pt[i][j].x );
+            fprintf( fp, "  %9.6f", pt[i][j].y );
+            fprintf( fp, "  %9.6f", z );
+            fprintf( fp, "  %9.6f", pt[i][j].z );
+            fprintf( fp, "  %9.6f", delta );
+
+            fputc( '\n', fp );
+        }
+	}
+
+	fputc( '\n', fp );
+    
 	return( ferror( fp ) );
 }
