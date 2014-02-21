@@ -60,8 +60,11 @@ extern  double  Chebyshev2Eval( double, double, MATRIX, unsigned, double, double
 extern  void    Points2( POINT [M][M], unsigned, MATRIX, unsigned, double, double );
 extern  int     Point2Write( FILE *, char *, POINT [M][M], unsigned, double (*)( double, double ) );
 
-extern	void	Integrate( MATRIX, MATRIX, unsigned, double, double, double );
+extern  void    ChebyshevTMatrix( MATRIX, unsigned );
 
+extern  void    MatrixMultiply( MATRIX, MATRIX, MATRIX, unsigned );
+extern  void    MatrixMultiplyByScalar( MATRIX, unsigned, double );
+extern  void    MatrixAddIdentity( MATRIX, unsigned );
 extern	double	MatrixSolve( unsigned, MATRIX, VECTOR, VECTOR );
 extern	double	MatrixLUdecomp( unsigned, MATRIX, int [N] );
 extern	double	MatrixLUdeterminant( unsigned, MATRIX, int [N] );
@@ -83,7 +86,7 @@ extern  int     fredholm( void );
 int
 main( int argc, char *argv[] ) {
 	VECTOR	 x, b;
-	MATRIX	 a, A;
+	MATRIX	 a, A, t;
 	POINT	 pt[M];
 	double	 upper   = getUpper();
 	double	 lower   = getLower();
@@ -106,16 +109,26 @@ main( int argc, char *argv[] ) {
 	Chebyshev2Coeff( a, n, lower, upper, K );
 	MatrixWrite( stdout, "K(x,y) Chebyshev coefficients", a, n, n );
 
-    if ( 1 ) {
+    if ( 0 ) {
         POINT grid[M][M];
 
         Points2( grid, M, a, n, lower, upper );
         Point2Write( stdout, "K(x,y)", grid, M, K );
     }
 
-	Integrate( a, A, n, lambda, lower, upper );
+    /* compute A = [ I + lambda * k * t ]      */
+
+    ChebyshevTMatrix( t, n );
+    MatrixMultiply( A, a, t, n );
+    MatrixMultiplyByScalar( A, n, 0.5 * lambda * ( upper - lower ) );
+
+    if ( fredholm() == 2 )
+        MatrixAddIdentity( A, n );
+
 	MatrixWrite( stdout, "A matrix", A, n, n );
 
+    /* solve the system of linear equations   */
+    
 	det = MatrixSolve( n, A, x, b );
 
     fprintf( stdout, "\tdet|A| = %9.6f\n\n", det );
@@ -150,7 +163,7 @@ ChebyshevCoeff( VECTOR a, unsigned n, double lower, double upper, double (*f)( d
     for ( i=0; i <= n; ++i )
         a[i]    = factor * ChebyshevEval( X[i], Y, np1, lower, upper );
 
-    a[0]    *= 0.5;                     /* half first and last term         */
+    a[0]    *= 0.5;
     a[n]    *= 0.5;
 
 	return;
@@ -176,7 +189,7 @@ Chebyshev2Coeff( MATRIX a, unsigned n, double lower, double upper, double (*f)( 
 		for ( ; j <= n; ++j )
 			K[i][j]	= (*f)( Xi, X[j] );
 
-        K[i][0] *= 0.5;                 /* half first and last term         */
+        K[i][0] *= 0.5;
 		K[i][n]	*= 0.5;
 	}
 
@@ -198,7 +211,7 @@ Chebyshev2Coeff( MATRIX a, unsigned n, double lower, double upper, double (*f)( 
 		}
 	}
 
-	for ( i=0; i <= n; ++i ) {          /* half the first and last terms */
+	for ( i=0; i <= n; ++i ) {
 		a[0][i]	*= 0.5;
 		a[i][0]	*= 0.5;
 		a[n][i]	*= 0.5;
@@ -239,15 +252,13 @@ Chebyshev2Eval( double x, double y, MATRIX K, unsigned n, double lower, double u
     return ChebyshevEval( x, b, n, lower, upper );
 }
 
-/*	Integrate - computes the matrix [ I + lambda * k * t ]						*/
+/* ChebyshevTMatrix - compute the t matrix. */
 
-	void
-Integrate( MATRIX b, MATRIX d, unsigned n, double lambda, double lower, double upper ) {
-	unsigned i      = 0;
-	double	 factor	= lambda * ( upper - lower ) / 2.0;
-	MATRIX	 t;
+void
+ChebyshevTMatrix( MATRIX t, unsigned n ) {
+    unsigned i = 0;
 
-	for ( ; i < n; ++i ) {                      /* compute t                    */
+	for ( ; i < n; ++i ) {
 		unsigned j = ( i % 2 )? 1 : 0;
 		unsigned k = ( i % 2 )? 0 : 1;
 
@@ -262,24 +273,7 @@ Integrate( MATRIX b, MATRIX d, unsigned n, double lambda, double lower, double u
 		}
 	}
 
-	for ( i=0; i < n; ++i ) {                   /* d = b * t                    */
-		unsigned j   = 0;
-
-		for ( ; j < n; ++j ) {
-			unsigned k   = 1;
-			double	 sum = b[i][0] * t[0][j];
-
-			for ( ; k < n; ++k )
-				sum	+= b[i][k] * t[k][j];
-
-			d[i][j]	= factor * sum;
-		}
-
-        if ( fredholm() == 2 )
-            d[i][i]	+= 1.0;                     /* d += I                       */
-	}
-
-	return;
+    return;
 }
 
 /*	Points - evaluate the Chebyshev approximation to f(x) at M points in the interval. */
@@ -321,7 +315,57 @@ Points2( POINT grid[M][M], unsigned m, MATRIX K, unsigned n, double lower, doubl
     return;
 }
 
-/*	MatrixSolve - solve a system of linear equations	*/
+/* MatrixMultiply - A = B * C  */
+
+void
+MatrixMultiply( MATRIX a, MATRIX b, MATRIX c, unsigned n ) {
+    unsigned i = 0;
+
+	for ( ; i < n; ++i ) {
+		unsigned j = 0;
+
+		for ( ; j < n; ++j ) {
+			unsigned k   = 0;
+			double	 sum = 0.0;
+
+			for ( ; k < n; ++k )
+				sum	+= b[i][k] * c[k][j];
+
+			a[i][j]	= sum;
+		}
+	}
+    return;
+}
+
+/* MatrixMultiplyByScalar - A *= scalar */
+
+void
+MatrixMultiplyByScalar( MATRIX a, unsigned n, double scalar ) {
+    unsigned i = 0;
+
+    for ( ; i < n; ++i ) {
+        unsigned j = 0;
+
+        for ( ; j < n; ++j )
+            a[i][j] *= scalar;
+    }
+
+    return;
+}
+
+/* MatrixAddIdentity - A += I */
+
+void
+MatrixAddIdentity( MATRIX a, unsigned n ) {
+    unsigned i = 0;
+
+    for ( ; i < n; ++i )
+        a[i][i] += 1.0;
+
+    return;
+}
+
+/*	MatrixSolve - solve Ax = b	*/
 
 	double
 MatrixSolve( unsigned n, MATRIX a, VECTOR x, VECTOR b ) {
