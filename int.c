@@ -221,9 +221,21 @@ Chebyshev2Coeff( MATRIX a, unsigned n, double lower, double upper, double (*f)( 
 	return;
 }
 
+/* PowerEval - evaulate a power series at a point               */
+
+double
+PowerEval( double x, VECTOR a, unsigned n ) {
+    double sum = 0.0;
+    
+    while ( n-- > 1 )
+        sum = ( sum + a[n] ) * x;
+    
+    return sum + a[0];
+}
+
 /*	ChebyshevEval - evaluate a Chebyshev series at a point		*/
 
-	double
+double
 ChebyshevEval( double x, VECTOR a, unsigned n, double lower, double upper ) {
 	double	c0	= 0.0;
 	double	c1	= 0.0;

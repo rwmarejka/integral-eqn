@@ -6,6 +6,8 @@
 
 #include <math.h>
 
+extern double PowerEval( double, double [], unsigned );
+
 double
 getLower() {
 	return 0.0;
@@ -32,9 +34,7 @@ K( double x, double y ) {
 }
 
 double
-f( double x ) {
-    double x2 = x * x;
-    double x4 = x2 * x2;
+f( double x ) { 
     double a[] = {
         +0.236282,
         +0.187227,
@@ -42,11 +42,8 @@ f( double x ) {
         +0.022725,
         +0.005017,
     };
-#define NTERMS (sizeof(a)/sizeof(a[0]))
-
-    double y = x4 + 0.1 * ( a[0] + a[1] * x + a[2] * x2 + a[3] * x2 * x + a[4] * x4 );
-
-	return y;
+    
+    return x * x * x * x + 0.1 * PowerEval( x, a, sizeof(a)/sizeof(a[0]) );
 }
 
 int
