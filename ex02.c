@@ -1,7 +1,6 @@
 /*
- * f(x) - int[0,1] |x-y| * f(y) dy = -( 2 * x^3 - 9 * x + 2 ) / 6
+ * QA Test 2 - lambda = -1, range[0,2*pi], use trig functions
  *
- * f(x) = x
  */
 
 #include <math.h>
@@ -13,7 +12,7 @@ getLower() {
 
 double
 getUpper() {
-	return 1.0;
+	return +2.0 * M_PI;
 }
 
 double
@@ -23,15 +22,20 @@ getLambda() {
 
 double
 g( double x ) {
-	return -( 2.0 * x * x * x - 9.0 * x + 2.0 ) / 6.0;
+	return x;
 }
 
 double
 K( double x, double y ) {
-	return fabs( x - y );
+	return sin( x + 2.0 * y );;
 }
 
 double
 f( double x ) {
-	return x;
+	return x - M_PI * cos( x );
+}
+
+int
+fredholm() {
+    return 2;
 }

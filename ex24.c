@@ -1,7 +1,7 @@
 /*
- *	f(x) - int [0,2 pi] sin( x + 2y ) f(y) dy = x
+ * Example - The Classical Theory of Integral Equations: A Concise Treatment
+ *             Chapter 2 -  Feedholm Intergal Equations of the Second Kind (General Kernel), pg 42
  *
- *	f(x) = x - pi cos( x )
  */
 
 #include <math.h>
@@ -13,7 +13,7 @@ getLower() {
 
 double
 getUpper() {
-	return 2.0 * M_PI;
+	return +2.0 * M_PI;
 }
 
 double
@@ -34,4 +34,9 @@ K( double x, double y ) {
 double
 f( double x ) {
 	return x - M_PI * cos( x );
+}
+
+int
+fredholm() {
+    return 2;
 }
