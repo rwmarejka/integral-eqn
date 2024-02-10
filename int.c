@@ -168,10 +168,6 @@ matrix_t *ChebyshevTMatrix( unsigned n ) {
 
 	for ( ; i < n; ++i ) {
 		unsigned j = ( i % 2 )? 1 : 0;
-		unsigned k = ( i % 2 )? 0 : 1;
-
-//		for ( ; k < n; k+=2 )
-//			t->m[i][k]	= 0.0;
 
 		for ( ; j < n; j+=2 ) {
 			int	diff = i - j;
