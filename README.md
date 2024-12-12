@@ -1,7 +1,5 @@
 # integral-eqn
-Fredholm Integral Equations of the Second Kind using Chebyshev Polynomials
+Fredholm Integral Equations of the First and Second Kind using Chebyshev polynomials
 
-A C program to solve Fredholm Integral Equations of the Second Kind using Chebyshev Polynomials
+A C program to solve Fredholm Integral Equations of the First and Second Kind using Chebyshev polynomials
 It uses the Fox & Parker (1968) approach of a Chebyshev approximation to the kernel function.
-
-Several examples are included along with Mac OS X Grapher.app files.
